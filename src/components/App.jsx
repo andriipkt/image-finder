@@ -19,37 +19,35 @@ export const App = () => {
   const [loadMore, setLoadMore] = useState(true);
 
   useEffect(() => {
-    if (!query) {
-      return;
-    } else {
-      fetchImages();
-    }
+    if (!query) return;
+
+    const fetchImages = async () => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetchAPI(query, page);
+        const { hits, totalHits } = response.data;
+
+        if (hits.length === 0) {
+          return Notiflix.Notify.failure('Нічого не знайдемо за Вашим запитом');
+        }
+
+        setImages(prevImages => [...prevImages, ...hits]);
+        setError(null);
+        setLoadMore(page < Math.ceil(totalHits / 12));
+      } catch (error) {
+        console.error(error);
+        setError('Помилка при завантаженні зображень.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchImages();
   }, [query, page]);
 
   const loadMoreImages = () => {
     setPage(prevPage => prevPage + 1);
-  };
-
-  const fetchImages = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetchAPI(query, page);
-      const { hits, totalHits } = response.data;
-
-      if (hits.length === 0) {
-        return Notiflix.Notify.failure('Нічого не знайдемо за Вашим запитом');
-      }
-
-      setImages(prevImages => [...prevImages, ...hits]);
-      setError(null);
-      setLoadMore(page < Math.ceil(totalHits / 12));
-    } catch (error) {
-      console.error(error);
-      setError('Помилка при завантаженні зображень.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSubmit = searchQuery => {
