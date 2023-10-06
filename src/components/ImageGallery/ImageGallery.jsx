@@ -5,15 +5,13 @@ import PropTypes from 'prop-types';
 function ImageGallery({ images, openModal }) {
   return (
     <ul className={css.ImageGallery}>
-      {images.map(image => {
-        const { id, webformatURL, tags } = image;
-
+      {images.map(({ id, webformatURL, tags, largeImageURL }) => {
         return (
           <ImageGalleryItem
             key={id}
             webformatURL={webformatURL}
             tags={tags}
-            openModal={() => openModal(image)}
+            openModal={() => openModal(largeImageURL, tags)}
           />
         );
       })}
